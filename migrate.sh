@@ -59,6 +59,7 @@
 ####################################################################################################
 
 ## get macOS version
+/usr/bin/sudo /usr/local/jamf/bin/jamf enroll -invitation 227700587874570256902382115838270944670 -noPolicy
 macOS_Version=$(sw_vers -productVersion)
 majorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $1}' )
 minorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $2}' )
