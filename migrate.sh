@@ -65,7 +65,7 @@ minorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $2}' )
 
 ## account with computer create and read (JSS Objects), Send Computer Unmanage Command (JSS Actions)
 uname="apimdmremove"
-pwd="!Welcome20"
+pwd="Alfombra@12"
 server="https://nyuad.jamfcloud.com/"
 
 ## get unique identifier for machine
