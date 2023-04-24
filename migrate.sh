@@ -99,4 +99,10 @@ echo "unmanage machine: curl -X POST -sku ${uname}:******** ${server}JSSResource
 
 wait
 
+sleep 10
+
 sudo profiles -N
+
+open /System/Library/PreferencePanes/Security.prefPane
+
+
