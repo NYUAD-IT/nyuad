@@ -62,16 +62,14 @@
 macOS_Version=$(sw_vers -productVersion)
 majorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $1}' )
 minorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $2}' )
-4="apimdmremove"
-5="!Welcome20"
-6="https://nyuad.jamfcloud.com"
 
 ## account with computer create and read (JSS Objects), Send Computer Unmanage Command (JSS Actions)
-uname="$4"
-pwd="$5"
+uname="apimdmremove"
+pwd="!Welcome20"
+server="https://nyuad.jamfcloud.com"
 
-if [ "$6" != "" ];then
-	server="$6"
+if [ "$server" != "" ];then
+	server="https://nyuad.jamfcloud.com"
 else
 	## get current Jamf server
 	server=$(/usr/bin/defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
