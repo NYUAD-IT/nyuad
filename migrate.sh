@@ -62,14 +62,16 @@
 macOS_Version=$(sw_vers -productVersion)
 majorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $1}' )
 minorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $2}' )
+4="apimdmremove"
+5="!Welcome20"
+6="https://nyuad.jamfcloud.com"
 
 ## account with computer create and read (JSS Objects), Send Computer Unmanage Command (JSS Actions)
-uname="apimdmremove"
-pwd="!Welcome20"
-$6="https://nyuad.jamfcloud.com"
+uname="$4"
+pwd="$5"
 
 if [ "$6" != "" ];then
-	server="https://nyuad.jamfcloud.com"
+	server="$6"
 else
 	## get current Jamf server
 	server=$(/usr/bin/defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
@@ -114,3 +116,4 @@ fi
 ## send unmanage command to machine
 echo "unmanage machine: curl -X POST -sku ${uname}:******** ${server}JSSResource/computercommands/command/UnmanageDevice/id/${compId}"
 /usr/bin/curl -X POST -sku "${uname}:${pwd}" ${server}JSSResource/computercommands/command/UnmanageDevice/id/${compId}
+
