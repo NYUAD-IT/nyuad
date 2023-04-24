@@ -69,7 +69,7 @@ pwd="!Welcome20"
 $6="https://nyuad.jamfcloud.com"
 
 if [ "$6" != "" ];then
-	server="$6"
+	server="https://nyuad.jamfcloud.com"
 else
 	## get current Jamf server
 	server=$(/usr/bin/defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
