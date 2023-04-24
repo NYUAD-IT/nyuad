@@ -66,26 +66,7 @@ minorVer=$( /bin/echo "$macOS_Version" | /usr/bin/awk -F. '{print $2}' )
 ## account with computer create and read (JSS Objects), Send Computer Unmanage Command (JSS Actions)
 uname="apimdmremove"
 pwd="!Welcome20"
-server="https://nyuad.jamfcloud.com"
-
-if [ "$server" != "" ];then
-	server="https://nyuad.jamfcloud.com"
-else
-	## get current Jamf server
-	server=$(/usr/bin/defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
-fi
-
-if [ "$server" == "" ];then
-    echo "unable to determine current Jamf server - exiting."
-    exit 1
-fi
-
-## ensure the server URL ends with a /
-strLen=$((${#server}-1))
-lastChar="${server:$strLen:1}"
-if [ ! "$lastChar" = "/" ];then
-    server="${server}/"
-fi
+server="https://nyuad.jamfcloud.com/"
 
 ## get unique identifier for machine
 udid=$(/usr/sbin/system_profiler SPHardwareDataType | awk '/UUID/ { print $3; }')
