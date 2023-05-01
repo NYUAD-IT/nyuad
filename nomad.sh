@@ -14,10 +14,10 @@ defaults write /Library/Preferences/menu.nomad.login.ad.plist ADDomain "$domain"
 defaults write /Library/Preferences/menu.nomad.login.ad.plist CreateAdminUser -bool Yes
 
 # Set background image
-defaults write /Library/Preferences/menu.nomad.login.ad.plist BackgroundImage "$background_image"
+#defaults write /Library/Preferences/menu.nomad.login.ad.plist BackgroundImage "$background_image"
 
 # Set login window logo
-defaults write /Library/Preferences/menu.nomad.login.ad.plist LoginLogo "$logo"
+#defaults write /Library/Preferences/menu.nomad.login.ad.plist LoginLogo "$logo"
 
 # Set security authorization database mechanisms with authchanger
 /usr/local/bin/authchanger -reset -AD
