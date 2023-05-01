@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Forked from https://nomad.menu/
+
 #NoMAD Prefereces
 
 # Preference key reference
