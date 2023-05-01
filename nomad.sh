@@ -1,7 +1,8 @@
+#!/bin/bash
+
 #NoMAD Prefereces
 
 # Preference key reference
-# https://gitlab.com/orchardandgrove-oss/NoMADLogin-AD/wikis/Configuration/preferences
 domain="ad.nyu.edu"
 background_image="/usr/local/nomadback.jpeg"
 #logo="/usr/local/nomadlogo.png"
@@ -26,7 +27,7 @@ defaults write /Library/Preferences/menu.nomad.login.ad.plist LoginLogo "$logo"
 echo "Installing Latest NoMAD" 
 cd /tmp
 curl -L -o nomadL.pkg https://files.nomad.menu/NoMAD-Login-AD.pkg
-echo "Installing NoMAD" >> $ws1log
+echo "Installing NoMAD"
 sudo -S installer -allowUntrusted -pkg "/tmp/nomadL.pkg" -target /;
 
         if [[ $? -eq 0 ]]; then
@@ -38,5 +39,5 @@ sudo -S installer -allowUntrusted -pkg "/tmp/nomadL.pkg" -target /;
 
 #Invoke Nomad UI
 # Kill loginwindow process to force NoMAD Login to launch
-#/usr/bin/killall -HUP loginwindow
+/usr/bin/killall -HUP loginwindow
 echo "Nomand Login Loaded"
