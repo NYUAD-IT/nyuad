@@ -4,7 +4,7 @@
 
 # Preference key reference
 domain="ad.nyu.edu"
-background_image="/usr/local/nomadback.jpeg"
+#background_image="/usr/local/nomadback.jpeg"
 #logo="/usr/local/nomadlogo.png"
 
 # Set default AD domain
