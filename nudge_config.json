@@ -2,8 +2,8 @@
     "preferences": {
         "button_title_text": "Ready to start the update?",
         "button_sub_titletext": "Click on the button below.",
-        "cut_off_date": "2023-08-31-00:00",
-        "cut_off_date_warning": 5,
+        "cut_off_date": "2023-08-25-00:00",
+        "cut_off_date_warning": 3,
         "days_between_notifications": 0,
         "logo_path": "/Library/nudge/company_logo.png",
         "main_subtitle_text": "A friendly reminder from your local IT team",
