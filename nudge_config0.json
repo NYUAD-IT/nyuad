@@ -26,5 +26,6 @@
         "timer_initial": 14400,
         "update_minor": false,
         "update_minor_days": 14
+        "dismissal_count_threshold": 100
     }
 }
