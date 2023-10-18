@@ -65,13 +65,13 @@
 
 param (
 	[String][Parameter(Mandatory)]
-	$server = "https://ds1688.awmdm.com",
+	$server,
 	[String][Parameter(Mandatory)]
-	$LGName = "aditwx",
+	$LGName,
 	[String][Parameter(Mandatory)]
-	$username = "aditwxstaging",
+	$username,
 	[String][Parameter(Mandatory)]
-	$Password = "stagwx",
+	$Password,
 	[bool]
 	$RemoveLegacyCatalog = $true,
 	[string][Parameter(Mandatory)]
