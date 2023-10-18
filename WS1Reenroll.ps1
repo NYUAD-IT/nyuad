@@ -75,10 +75,7 @@ param (
 	[bool]
 	$RemoveLegacyCatalog = $true,
 	[string][Parameter(Mandatory)]
-	[ValidateScript({
-		if($_ -eq "Always" -or $_ -eq "OnSIDMismatch" -or $_ -eq "Never") {
-		$true
-	} else {throw "$_ is invalid. Specify Always, OnSIDMismatch, or Never"}
+	$Unenroll = "OnSIDMismatch"
 })]
 	$Unenroll
 
