@@ -837,19 +837,6 @@ elseif ($Arch -eq 'amd64')
 	Write-log 'Running 64-bit PowerShell'
 }
 
-#Checking connection to target server before doing anything else
-Write-Log "Verifying connection to the target UEM server: $server"
-$connectionStatus  = Test-Connection -ComputerName $server -Quiet
-if($connectionStatus)
-{
-	Write-Log "Test connection passed."
-
-}
-else{
-	Write-Log "Connection failed to $server. Exiting script. "
-	exit 1
-}
-
 switch ($Unenroll) {
 	"Always" { 
 		$enrollment = Get-Enrollment
