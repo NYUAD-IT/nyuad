@@ -80,7 +80,7 @@ param (
 		$true
 	} else {throw "$_ is invalid. Specify Always, OnSIDMismatch, or Never"}
 })]
-	$Unenroll = "OnSIDMismatch"
+	$Unenroll
 
 )
 #-----------------PSADT Function "QueryUser" from AppDeployToolkitMain.cs file------------------------------------
