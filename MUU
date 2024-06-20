@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Created by Chris Mariano (cdm436@nyu.edu)
-# Description: MacOS Security Update Script via WS1 HubCLI
+# Title: MacOS Security Update Script via WS1 HubCLI 
 # License: MIT License
 # Date: 2024-03-27
 # Version: 2.0
