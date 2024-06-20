@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Created by Chris Mariano (cdm436@nyu.edu)
+# Description: MacOS Security Update Script via WS1 HubCLI
+# License: MIT License
+# Date: 2024-03-27
+# Version: 2.0
+
+
+# Define the path to the start date file
+start_date_file="/Users/shared/muuMar2024.txt"
+
+# Check if the start date file exists
+if [ ! -f "$start_date_file" ]; then
+    # If the file doesn't exist, create it and write the current date
+    date +%s > "$start_date_file"
+fi
+
+# Read the start date from the file
+start_date=$(cat "$start_date_file")
+
+# Fetch the HTML content and extract table
+curl -s https://support.apple.com/en-ae/109033 | \
+grep -o '<div class="table-wrapper gb-table">.*</div>' | \
+awk -F'<tr>' '{
+    for(i=2; i<=NF; i++) {
+        gsub(/<\/?(p|th|td|tr)[^>]*>/,"",$i);
+        printf "%s\n", $i
+    }
+}' | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' > apple_versions.txt
+
+# Get sw_vers -productVersion
+mac_version=$(sw_vers -productVersion)
+
+# Extract major version
+major=$(echo "$mac_version" | cut -d '.' -f 1)
+
+# Find the corresponding version in the list
+version=$(grep "^$major\." apple_versions.txt)
+
+# Check if version exists
+if [ -n "$version" ]; then
+    echo "Latest security build for $major is $version"
+else
+    echo "No security build information found for this macOS version"
+fi
+
+# Display current macOS version
+echo "This Mac: $mac_version"
+
+# Extract major version from the macOS version
+major_mac=$(echo "$mac_version" | cut -d '.' -f 1)
+minor_mac=$(echo "$mac_version" | cut -d '.' -f 2)
+# Extract major version from the version
+major=$(echo "$version" | cut -d '.' -f 1)
+minor=$(echo "$version" | cut -d '.' -f 2)
+
+# Fetch latest OS versions
+os_list=$(softwareupdate --list-full-installers | awk -F 'Version: |, Size' '/Title:/{print $2}')
+sorted_os_list=$(sort -r --version-sort <<<"$os_list")
+highest_version=$(echo "$sorted_os_list" | head -n 1)
+echo "Highest version available: $highest_version"
+
+# Check if macOS version is less than 12.0
+if ((major_mac < 12)); then
+    # If macOS version is less than 12.0, mark as EOL
+    echo "EOL. Exiting"
+    exit 0
+elif ((major_mac >= 14 && minor_mac >= 4)); then
+    # If macOS version is 14.4 or higher, mark as current
+    echo "OS is current. Exiting"
+    exit 0
+else
+    # If macOS version is between 12.0 and 14.X, notify user to upgrade
+    current_date=$(date +%s)
+    elapsed_days=$(( (current_date - start_date) / 86400 ))  # Calculate elapsed days
+    defer_days="7" #Set prefered defer days 
+    remaining_days=$((defer_days - elapsed_days))  # Calculate remaining days
+    echo Remaining days: $remaining_days
+
+    if [ $elapsed_days -ge $defer_days ]; then
+        echo "Forcing Update"
+        sudo /usr/local/bin/hubcli notify \
+        -t "NYUAD Mandatory macOS Upgrade" \
+        -s "$defer_days days elapsed. Update is being applied" \
+        -i "Your machine will restart automatically once completed. This may take up to 1 hour and will be notified for reboot." 
+        sudo /usr/local/bin/hubcli mdmcommand --osupdate --productversion "$highest_version" --installaction InstallASAP
+        exit 0
+    else
+        echo "Notifying user to upgrade to $highest_version"
+        # Defer option
+        #Notify User
+        sudo /usr/local/bin/hubcli notify \
+        -t "< macOS update is available  >" \
+        -s "This may take up to 1 hour." \
+        -i "Your machine will restart automatically. You will be notified when your device will be restarted. You have "$remaining_days" days to defer." \
+        -a "Update Now" \
+        -b "sudo /usr/local/bin/hubcli mdmcommand --osupdate --productversion "$highest_version" --installaction InstallASAP" \
+        -c "Update Later"
+    fi
+fi
+
+# Clean up temporary files
+rm apple_versions.txt
