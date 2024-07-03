@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Created by Chris Mariano (cdm436@nyu.edu)
+# Title: Automate rclone copy for gdrive
+# License: MIT License
+
 # Define the port to use for the authentication process
 AUTH_PORT=53682
 TIMEOUT=300  # Timeout in seconds (5 minutes)
