@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Created by Chris Mariano (cdm436@nyu.edu)
-# Title: Automate rclone copy for gdrive
-# License: MIT License
-
 # Define the port to use for the authentication process
 AUTH_PORT=53682
+TIMEOUT=300  # Timeout in seconds (5 minutes)
 
 # Function to display GUI instructions
 show_instructions() {
@@ -28,10 +25,39 @@ EOF
 }
 
 # Function to install rclone using the official installation script
-install_rclone() {
+install_rclone2() {
   echo "Installing rclone..."
-  sudo -v
-  curl https://rclone.org/install.sh | sudo bash
+  #sudo -v
+  #curl https://rclone.org/install.sh | sudo bash
+}
+
+# Function to check if Homebrew is installed
+check_homebrew() {
+  if ! command -v brew &> /dev/null; then
+    echo "Homebrew not found. Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Ensure brew command is in the PATH
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+    echo "Homebrew is already installed."
+  fi
+}
+
+# Function to install rclone and coreutils
+install_tools() {
+  if ! brew list rclone &> /dev/null; then
+    echo "Installing rclone..."
+    brew install rclone
+  else
+    echo "rclone is already installed."
+  fi
+
+  if ! brew list coreutils &> /dev/null; then
+    echo "Installing coreutils..."
+    brew install coreutils
+  else
+    echo "coreutils is already installed."
+  fi
 }
 
 # Function to check if a port is in use and stop the process using it
@@ -58,9 +84,10 @@ configure_rclone() {
 
   ensure_port_free $AUTH_PORT
 
-  rclone config create mygoogledrive drive --rc-addr=127.0.0.1:$AUTH_PORT
-  if [ $? -ne 0 ]; then
-    echo "Failed to configure rclone with Google Drive. Exiting."
+  gtimeout $TIMEOUT rclone config create mygoogledrive drive --rc-addr=127.0.0.1:$AUTH_PORT
+
+  if [ $? -eq 124 ]; then
+    echo "rclone configuration timed out after $TIMEOUT seconds."
     exit 1
   fi
 }
@@ -91,6 +118,20 @@ close_browser_pages() {
       end repeat
     end tell
 EOF
+}
+
+# Function to show GUI with options to Copy or Move
+show_gui_options() {
+  local choice
+  choice=$(osascript <<EOF
+    tell application "System Events"
+      activate
+      set theChoice to button returned of (display dialog "Google Drive Connected" buttons {"Copy", "Move"} default button "Copy")
+      return theChoice
+    end tell
+EOF
+  )
+  echo "$choice"
 }
 
 # Function to prompt the user for the destination directory using AppleScript
@@ -129,8 +170,8 @@ EOF
 
 # Main script
 show_instructions
-
-install_rclone
+check_homebrew
+install_tools
 configure_rclone
 
 if rclone lsd mygoogledrive: &> /dev/null; then
