@@ -48,9 +48,6 @@ ensure_port_free() {
 
 # Function to configure rclone with Google Drive
 configure_rclone() {
-  local start_time=$(date +%s)
-  local elapsed_time=0
-
   # Check if rclone config already exists and remove it if necessary
   if rclone listremotes | grep -q "^mygoogledrive:"; then
     echo "Removing existing mygoogledrive configuration..."
@@ -62,19 +59,13 @@ configure_rclone() {
 
   ensure_port_free $AUTH_PORT
 
-  # Loop until timeout or successful configuration
-  while [ $elapsed_time -lt $TIMEOUT ]; do
-    rclone config create mygoogledrive drive --rc-addr=127.0.0.1:$AUTH_PORT &> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "rclone configuration completed."
-      return 0
-    fi
-    sleep 5
-    elapsed_time=$(( $(date +%s) - $start_time ))
-  done
+  sudo -v
+  timeout $TIMEOUT rclone config create mygoogledrive drive --rc-addr=127.0.0.1:$AUTH_PORT
 
-  echo "rclone configuration timed out after $TIMEOUT seconds."
-  exit 1
+  if [ $? -eq 124 ]; then
+    echo "rclone configuration timed out after $TIMEOUT seconds."
+    exit 1
+  fi
 }
 
 # Function to close any open browser pages with http://127.0.0.1:53682/
