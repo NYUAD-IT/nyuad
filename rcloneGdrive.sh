@@ -15,7 +15,7 @@ show_instructions() {
       activate
       display dialog "NYUAD Rclone-Google Drive File Transfer Utility
 
-1. Click \"Proceed\" to run this script and and type your mac login password if prompted.
+1. Click \"Proceed\" to run and allow any permission request if prompted.
 2. Next a browser window will open for Google authentication.
 3. Once authenticated, you will be prompted to allow RClone App for permission. Click \"Allow\".
 4. WAIT FOR THE WINDOW to select whether to copy or move files.
@@ -28,35 +28,12 @@ Click \"Proceed\" to continue." with title "Rclone Setup Instructions" buttons {
 EOF
 }
 
-# Function to check if Homebrew is installed
-check_homebrew() {
-  if ! command -v brew &> /dev/null; then
-    echo "Homebrew not found. Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Ensure brew command is in the PATH
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  else
-    echo "Homebrew is already installed."
-  fi
+# Function to install rclone using the official installation script
+install_rclone() {
+  echo "Installing rclone..."
+  sudo -v
+  curl https://rclone.org/install.sh | sudo bash
 }
-
-# Function to install rclone and coreutils
-install_tools() {
-  if ! brew list rclone &> /dev/null; then
-    echo "Installing rclone..."
-    brew install rclone
-  else
-    echo "rclone is already installed."
-  fi
-
-  if ! brew list coreutils &> /dev/null; then
-    echo "Installing coreutils..."
-    brew install coreutils
-  else
-    echo "coreutils is already installed."
-  fi
-}
-
 
 # Function to check if a port is in use and stop the process using it
 ensure_port_free() {
