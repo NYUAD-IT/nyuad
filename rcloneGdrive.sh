@@ -133,8 +133,7 @@ EOF
 # Main script
 show_instructions
 
-check_homebrew
-install_tools
+install_rclone
 configure_rclone
 
 if rclone lsd mygoogledrive: &> /dev/null; then
