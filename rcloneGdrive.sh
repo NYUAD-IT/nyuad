@@ -58,9 +58,7 @@ configure_rclone() {
   echo "This will open a browser window for authentication."
 
   ensure_port_free $AUTH_PORT
-
-  sudo -v
-
+  gtimeout $TIMEOUT rclone config create nyuad_gdrive drive --rc-addr=127.0.0.1:$AUTH_PORT
   if [ $? -eq 124 ]; then
     echo "rclone configuration timed out after $TIMEOUT seconds."
     exit 1
