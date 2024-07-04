@@ -28,6 +28,23 @@ Click \"Proceed\" to continue." with title "Rclone Setup Instructions" buttons {
 EOF
 }
 
+# Function to install rclone and coreutils
+install_tools() {
+  if ! brew list rclone &> /dev/null; then
+    echo "Installing rclone..."
+    brew install rclone
+  else
+    echo "rclone is already installed."
+  fi
+
+  if ! brew list coreutils &> /dev/null; then
+    echo "Installing coreutils..."
+    brew install coreutils
+  else
+    echo "coreutils is already installed."
+  fi
+}
+
 # Function to install rclone using the official installation script
 install_rclone() {
   echo "Installing rclone..."
@@ -129,7 +146,7 @@ EOF
 
 # Main script
 show_instructions
-
+install_tools
 install_rclone
 configure_rclone
 
