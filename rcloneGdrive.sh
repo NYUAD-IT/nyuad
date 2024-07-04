@@ -8,6 +8,26 @@
 AUTH_PORT=53682
 TIMEOUT=300  # Timeout in seconds (5 minutes)
 
+# Function to display GUI instructions
+show_instructions() {
+  osascript <<EOF
+    tell application "System Events"
+      activate
+      display dialog "NYUAD Rclone-Google Drive File Transfer Utility
+
+1. Click \"Proceed\" to run this script and and type your mac login password if prompted.
+2. Next a browser window will open for Google authentication.
+3. Once authenticated, you will be prompted to allow RClone App for permission. Click \"Allow\".
+4. WAIT FOR THE WINDOW to select whether to copy or move files.
+5. Finally, select the destination for the transfer.
+
+Note: This is beta software. Use at your own risk. Contact NYUAD IT if you have any questions.
+
+Click \"Proceed\" to continue." with title "Rclone Setup Instructions" buttons {"Proceed"} default button "Proceed"
+    end tell
+EOF
+}
+
 # Function to check if Homebrew is installed
 check_homebrew() {
   if ! command -v brew &> /dev/null; then
@@ -37,6 +57,7 @@ install_tools() {
   fi
 }
 
+
 # Function to check if a port is in use and stop the process using it
 ensure_port_free() {
   local port=$1
@@ -51,9 +72,9 @@ ensure_port_free() {
 # Function to configure rclone with Google Drive
 configure_rclone() {
   # Check if rclone config already exists and remove it if necessary
-  if rclone listremotes | grep -q "^nyuad_gdrive:"; then
-    echo "Removing existing nyuad_gdrive configuration..."
-    rclone config delete nyuad_gdrive
+  if rclone listremotes | grep -q "^mygoogledrive:"; then
+    echo "Removing existing mygoogledrive configuration..."
+    rclone config delete mygoogledrive
   fi
 
   echo "Configuring rclone with Google Drive..."
@@ -61,12 +82,40 @@ configure_rclone() {
 
   ensure_port_free $AUTH_PORT
 
-  gtimeout $TIMEOUT rclone config create nyuad_gdrive drive --rc-addr=127.0.0.1:$AUTH_PORT
+  gtimeout $TIMEOUT rclone config create mygoogledrive drive --rc-addr=127.0.0.1:$AUTH_PORT
 
   if [ $? -eq 124 ]; then
     echo "rclone configuration timed out after $TIMEOUT seconds."
     exit 1
   fi
+}
+
+# Function to close any open browser pages with http://127.0.0.1:53682/
+close_browser_pages() {
+  osascript <<EOF
+    tell application "Google Chrome"
+      set windowList to every window
+      repeat with aWindow in windowList
+        set tabList to every tab of aWindow
+        repeat with atab in tabList
+          if URL of atab contains "http://127.0.0.1:$AUTH_PORT/" then
+            close atab
+          end if
+        end repeat
+      end repeat
+    end tell
+    tell application "Safari"
+      set windowList to every window
+      repeat with aWindow in windowList
+        set tabList to every tab of aWindow
+        repeat with atab in tabList
+          if URL of atab contains "http://127.0.0.1:$AUTH_PORT/" then
+            close atab
+          end if
+        end repeat
+      end repeat
+    end tell
+EOF
 }
 
 # Function to prompt the user for the destination directory using AppleScript
@@ -75,7 +124,7 @@ select_destination() {
   dest_dir=$(osascript <<EOF
     tell application "System Events"
       activate
-      set theFolder to choose folder with prompt "Select Destination Directory for Google Drive Copy"
+      set theFolder to choose folder with prompt "Select Destination Directory for Google Drive"
       return POSIX path of theFolder
     end tell
 EOF
@@ -83,8 +132,9 @@ EOF
   echo "$dest_dir"
 }
 
-# Function to copy the entire Google Drive to a selected location
-copy_drive() {
+# Function to copy or move the entire Google Drive to a selected location
+transfer_drive() {
+  local action=$1
   local dest_dir
   dest_dir=$(select_destination)
 
@@ -93,22 +143,37 @@ copy_drive() {
     exit 1
   fi
 
-  echo "Copying Google Drive to $dest_dir..."
+  echo "${action}ing Google Drive to $dest_dir..."
   osascript <<EOF
     tell application "Terminal"
-      do script "rclone copy nyuad_gdrive: \"$dest_dir\" --progress --drive-acknowledge-abuse"
+      do script "rclone ${action} mygoogledrive: \"$dest_dir\" --progress"
       activate
     end tell
 EOF
 }
 
 # Main script
+show_instructions
+
 check_homebrew
 install_tools
 configure_rclone
 
-if rclone lsd nyuad_gdrive: &> /dev/null; then
-  copy_drive
+if rclone lsd mygoogledrive: &> /dev/null; then
+  close_browser_pages
+  choice=$(osascript <<EOF
+    tell application "System Events"
+      activate
+      set theChoice to button returned of (display dialog "Google Drive is ready, select tranfer mode" buttons {"Copy", "Move"} default button "Copy")
+      return theChoice
+    end tell
+EOF
+  )
+  case $choice in
+    "Copy") transfer_drive "copy" ;;
+    "Move") transfer_drive "move" ;;
+    *) echo "Invalid choice. Exiting." ; exit 1 ;;
+  esac
 else
   echo "Failed to connect to Google Drive. Exiting."
   exit 1
