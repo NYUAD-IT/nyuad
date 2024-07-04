@@ -6,7 +6,6 @@
 
 # Define the port to use for the authentication process
 AUTH_PORT=53682
-TIMEOUT=300  # Timeout in seconds (5 minutes)
 
 # Function to display GUI instructions
 show_instructions() {
@@ -122,7 +121,7 @@ transfer_drive() {
   echo "${action}ing Google Drive to $dest_dir..."
   osascript <<EOF
     tell application "Terminal"
-      do script "rclone ${action} mygoogledrive: \"$dest_dir\" --progress"
+      do script "rclone ${action} mygoogledrive: \"$dest_dir\" --progress --drive-acknowledge-abuse"
       activate
     end tell
 EOF
